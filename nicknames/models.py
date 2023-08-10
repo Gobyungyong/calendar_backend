@@ -8,5 +8,5 @@ class Nickname(models.Model):
 
     user = models.ForeignKey("users.User", on_delete=models.CASCADE)
 
-    def __str__(self) -> str:
-        return self.user
+    # def __str__(self) -> str:
+    #     return self.user

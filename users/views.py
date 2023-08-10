@@ -30,7 +30,9 @@ class NewUser(APIView):
             )
             return Response(status=status.HTTP_201_CREATED)
 
-        return Response("유효하지 않은 정보입니다.", status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"errors": "유효하지 않은 정보입니다."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class Login(APIView):
@@ -48,9 +50,11 @@ class Login(APIView):
 
         if user:
             login(request, user)
-            return Response("login success", status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
 
-        return Response("올바른 유저정보가 아닙니다.", status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"errors": "올바른 유저정보가 아닙니다."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class Logout(APIView):
@@ -58,7 +62,7 @@ class Logout(APIView):
 
     def post(self, request):
         logout(request)
-        return Response("logout success", status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
 
 class UserInfo(APIView):
@@ -89,4 +93,4 @@ class UserInfo(APIView):
         user.set_password(request.data["password"])
         user.save()
 
-        return Response("modify success", status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_202_ACCEPTED)

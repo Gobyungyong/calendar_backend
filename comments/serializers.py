@@ -6,6 +6,7 @@ from .models import Comment
 
 class CommentSerializer(ModelSerializer):
     author = UserSerializer(read_only=True)
+    schedule = ScheduleSerializer(read_only=True)
 
     class Meta:
         model = Comment
