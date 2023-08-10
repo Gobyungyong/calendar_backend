@@ -34,7 +34,7 @@ class Schedule(models.Model):
         "users.User", on_delete=models.CASCADE
     )  # user이 삭제되면 schedule도 삭제
     team = models.ForeignKey(
-        "teams.Team", on_delete=models.CASCADE, blank=True
+        "teams.Team", on_delete=models.CASCADE, blank=True, null=True,
     )  # team이 삭제되면 schedule도 삭제
 
     def __str__(self) -> str:
