@@ -14,16 +14,15 @@ class NewComment(APIView):
 
     def post(self, request):
         serializer = CommentSerializer(data=request.data)
-
         try:
-            schedule = Schedule.objects.get(id=request.data.get("schedule"))
+            schedule = Schedule.objects.get(id=request.data.get("schedule_id"))
         except Schedule.DoesNotExist:
             raise NotFound("해당하는 일정이 없습니다.")
 
         if serializer.is_valid():
-            newSchedule = serializer.save(author=request.user, schedule=schedule)
+            new_comment = serializer.save(author=request.user, schedule=schedule)
             return Response(
-                CommentSerializer(newSchedule).data,
+                CommentSerializer(new_comment).data,
                 status=status.HTTP_201_CREATED,
             )
 
@@ -49,4 +48,4 @@ class DeleteComment(APIView):
             raise PermissionDenied("삭제권한이 없습니다.")
 
         comment.delete()
-        return Response("delete success", status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)

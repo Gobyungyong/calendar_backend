@@ -11,4 +11,4 @@ class Comment(models.Model):
     schedule = models.ForeignKey("schedules.Schedule", on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return self.schedule
+        return f"{self.author} - {self.description}"
