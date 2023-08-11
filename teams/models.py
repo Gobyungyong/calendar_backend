@@ -6,7 +6,7 @@ class Team(models.Model):
     teamname = models.CharField(max_length=20)
     color = models.CharField(max_length=15)
 
-    members = models.ManyToManyField("users.User")
+    members = models.ManyToManyField("users.User", null=True)
 
     def __str__(self) -> str:
         return self.teamname
