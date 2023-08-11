@@ -11,7 +11,7 @@ from .serializers import SignUpUserSerializer, UserInfoSerializer
 from .models import User
 
 
-class NewUser(APIView):
+class Signup(APIView):
     def post(self, request):
         user = SignUpUserSerializer(data=request.data)
 
@@ -22,12 +22,14 @@ class NewUser(APIView):
             )
 
         if user.is_valid():
-            User.objects.create_user(
+            user = User.objects.create_user(
                 username=request.data["username"],
                 name=request.data["name"],
                 password=request.data["password"],
                 email=request.data["email"],
             )
+            print(user)
+            login(request, user)
             return Response(status=status.HTTP_201_CREATED)
 
         return Response(
@@ -63,6 +65,20 @@ class Logout(APIView):
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_200_OK)
+
+
+class CheckUsername(APIView):
+    def post(self, request):
+        username = request.data["username"]
+        if not username:
+            raise ParseError("아이디 값이 없습니다.")
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {"errors": "이미 존재하는 아이디입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response({"message": "사용가능한 아이디입니다."}, status=status.HTTP_200_OK)
 
 
 class UserInfo(APIView):
