@@ -32,7 +32,7 @@ class NewComment(APIView):
         )
 
 
-class DeleteComment(APIView):
+class Comments(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
@@ -44,8 +44,32 @@ class DeleteComment(APIView):
     def delete(self, request, comment_id):
         comment = self.get_object(comment_id)
 
-        if comment.author != request.user:  # 추후 teamleader 추가 시 권한추가
+        if (comment.author != request.user) and (
+            comment.schedule.team.team_leader != request.user
+        ):
             raise PermissionDenied("삭제권한이 없습니다.")
 
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request, comment_id):
+        comment = self.get_object(comment_id)
+
+        serializer = CommentSerializer(
+            comment,
+            data=request.data,
+            partial=True,
+        )
+
+        if (comment.author != request.user) and (
+            comment.schedule.team.team_leader != request.user
+        ):
+            raise PermissionDenied("수정권한이 없습니다.")
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(
+            {"errors": "올바르지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST
+        )
