@@ -15,10 +15,7 @@ class NewTeam(APIView):
     def post(self, request):
         serializer = TeamSerializer(data=request.data)
         if serializer.is_valid():
-            new_team = serializer.save()
-            team_leader = User.objects.get(username=request.user)
-            team_leader.leader = new_team
-            team_leader.save()
+            serializer.save(team_leader=request.user)
             return Response(status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -60,9 +57,7 @@ class Teams(APIView):
             partial=True,
         )
 
-        try:
-            team.leader.get(username=request.user)
-        except:
+        if team.team_leader != request.user:
             raise PermissionDenied("팀 정보수정은 팀장만 가능합니다.")
 
         if serializer.is_valid():
@@ -76,9 +71,7 @@ class Teams(APIView):
     def delete(self, request, team_id):
         team = self.get_team(team_id)
 
-        try:
-            team.leader.get(username=request.user)
-        except:
+        if team.team_leader != request.user:
             raise PermissionDenied("팀 삭제는 팀장만 가능합니다.")
 
         team.delete()
