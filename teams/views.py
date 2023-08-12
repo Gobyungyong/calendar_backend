@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied, ParseError
 
 from .serializers import TeamSerializer
 from users.models import User
@@ -17,7 +17,7 @@ class NewTeam(APIView):
         if serializer.is_valid():
             serializer.save(team_leader=request.user)
             return Response(status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        raise ParseError("잘못된 요청입니다.")
 
 
 class Teams(APIView):
@@ -64,9 +64,7 @@ class Teams(APIView):
             serializer.save()
             return Response(status=status.HTTP_200_OK)
 
-        return Response(
-            {"errors": "올바르지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST
-        )
+        raise ParseError("잘못된 요청입니다.")
 
     def delete(self, request, team_id):
         team = self.get_team(team_id)

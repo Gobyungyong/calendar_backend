@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied, ParseError
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -26,10 +26,7 @@ class NewComment(APIView):
                 status=status.HTTP_201_CREATED,
             )
 
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        raise ParseError("잘못된 요청입니다.")
 
 
 class Comments(APIView):
@@ -70,6 +67,4 @@ class Comments(APIView):
             serializer.save()
             return Response(status=status.HTTP_200_OK)
 
-        return Response(
-            {"errors": "올바르지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST
-        )
+        raise ParseError("잘못된 요청입니다.")

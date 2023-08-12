@@ -5,4 +5,4 @@ from .models import Nickname
 # Register your models here.
 @admin.register(Nickname)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ("nickname",)
+    list_display = ("nickname", "team")
