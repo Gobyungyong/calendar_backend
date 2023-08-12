@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Nickname
+from .serializers import AddNicknameSerializer
 from teams.models import Team
 
 
@@ -17,10 +18,26 @@ class Nicknames(APIView):
         except:
             raise NotFound("존재하지 않는 팀입니다.")
 
-    def post(self, request):  # 생성
-        pass
+    def post(self, request, team_id):
+        serializer = AddNicknameSerializer(data=request.data)
+        team = self.get_team(team_id)
 
-    def put(self, request, team_id):  # 중복검사
+        if Nickname.objects.filter(
+            team=team,
+            nickname=request.data["nickname"],
+        ).exists():
+            raise ValidationError("중복된 닉네임입니다.")
+
+        if serializer.is_valid():
+            serializer.save(
+                user=request.user,
+                team=team,
+            )
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, team_id):
         team = self.get_team(team_id)
         try:
             nickname = request.data["nickname"]
