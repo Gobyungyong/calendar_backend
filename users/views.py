@@ -108,3 +108,15 @@ class UserInfo(APIView):
         user.save()
 
         return Response(status=status.HTTP_202_ACCEPTED)
+
+    def delete(self, request, username):
+        user = self.get_object(username)
+
+        if user != request.user:
+            raise PermissionDenied("비밀번호 변경 권한이 없습니다.")
+
+        user.is_active = False
+        user.save()
+        logout(request)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
