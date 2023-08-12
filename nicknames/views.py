@@ -35,7 +35,7 @@ class Nicknames(APIView):
             )
             return Response(status=status.HTTP_200_OK)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        raise ParseError("잘못된 요청입니다.")
 
     def put(self, request, team_id):
         team = self.get_team(team_id)

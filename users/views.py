@@ -32,9 +32,7 @@ class Signup(APIView):
             login(request, user)
             return Response(status=status.HTTP_201_CREATED)
 
-        return Response(
-            {"errors": "유효하지 않은 정보입니다."}, status=status.HTTP_400_BAD_REQUEST
-        )
+        raise ParseError("잘못된 요청입니다.")
 
 
 class Login(APIView):
