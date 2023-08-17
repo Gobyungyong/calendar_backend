@@ -17,10 +17,10 @@ class Schedules(APIView):
         try:
             user = request.user
 
-            if hasattr(user, "team"):
-                team = user.team
+            if user.team_set.all().exists():
+                teams = user.team_set.all()
                 user_schedules = Schedule.objects.filter(user=user)
-                team_schedules = Schedule.objects.filter(team=team)
+                team_schedules = Schedule.objects.filter(team__in=teams)
                 schedules = user_schedules.union(team_schedules)
                 serializer = serializers.ScheduleSerializer(
                     schedules,
@@ -57,7 +57,65 @@ class Schedules(APIView):
 
 
 class ScheduleDetails(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            return Schedule.objects.get(pk=pk)
+        except Schedule.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        schedule = self.get_object(pk)
+        serializer = serializers.ScheduleSerializer(schedule)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        schedule = self.get_object(pk)
+
+        if schedule.user == request.user or (
+            hasattr(schedule.team, "team_leader")
+            and schedule.team.team_leader == request.user,
+        ):
+            serializer = serializers.ScheduleSerializer(
+                schedule,
+                data=request.data,
+                partial=True,
+            )
+        if serializer.is_valid():
+            updated_schedule = serializer.save()
+            return Response(
+                serializers.ScheduleSerializer(updated_schedule).data,
+            )
+        else:
+            return Response(serializer.errors)
+
+    def delete(self, request, pk):
+        schedule = self.get_object(pk)
+
+        print(schedule.team)
+        if schedule.team:
+            if (
+                schedule.user == request.user
+                or schedule.team.team_leader == request.user
+            ):
+                schedule.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                raise PermissionDenied
+        else:
+            if schedule.user == request.user:
+                schedule.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                raise PermissionDenied
+
+    # def post(self, request, pk):
+    #     schedule = self.get_object(pk)
+    #     print("문자열:", schedule.user)
+    #     print("request", request.user)
+
+    #     print(schedule.team)
 
 
 class ScheduleSearch(APIView):
