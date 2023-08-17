@@ -7,7 +7,7 @@ from .models import Schedule
 from . import serializers
 
 
-class UserTeamSchedules(APIView):
+class Schedules(APIView):
     def get(self, request):
         try:
             # 사용자가 요청받은 사용자인지 확인

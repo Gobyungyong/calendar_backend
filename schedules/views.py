@@ -9,8 +9,8 @@ from . import serializers
 
 
 # team에 속한 user의 team schedule과 개인 스케줄
-class UserTeamSchedules(APIView):
-    authentication_classes = [TokenAuthentication]
+class Schedules(APIView):
+    # authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -39,3 +39,26 @@ class UserTeamSchedules(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PermissionDenied:
             return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def post(self, request):
+        serializer = serializers.ScheduleSerializer(data=request.data)
+
+        if serializer.is_valid():
+            schedule = serializer.save()
+            return Response(
+                serializers.ScheduleSerializer(schedule).data,
+                status=status.HTTP_201_CREATED,
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class ScheduleDetails(APIView):
+    pass
+
+
+class ScheduleSearch(APIView):
+    pass
