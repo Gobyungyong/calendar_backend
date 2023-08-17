@@ -1,31 +1,41 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from .models import Schedule
 from . import serializers
 
 
-# 스케줄의 대략적인 정보
-class Schedules(APIView):
+# team에 속한 user의 team schedule과 개인 스케줄
+class UserTeamSchedules(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        all_schedules = Schedule.objects.filter(user=request.user)
-        serializer = serializers.ScheduleSerializer(
-            all_schedules,
-            many=True,
-        )
-        return Response(serializer.data)
-
-
-# 스케줄의 세부 정보 (description, 개인or팀, 댓글..? )
-class ScheduleDetail(APIView):
-    def get_object(self, pk):
         try:
-            return Schedule.objects.get(pk=pk)
-        except Schedule.DoesNotExist:
-            raise NotFound
+            user = request.user
 
-    def get(self, request, pk):
-        schedule = self.get_object(pk)
-        serializer = serializers.ScheduleSerializer(schedule)
-        return Response(serializer.data)
+            if hasattr(user, "team"):
+                team = user.team
+                user_schedules = Schedule.objects.filter(user=user)
+                team_schedules = Schedule.objects.filter(team=team)
+                schedules = user_schedules.union(team_schedules)
+                serializer = serializers.ScheduleSerializer(
+                    schedules,
+                    many=True,
+                )
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                user_schedules = Schedule.objects.filter(user=user)
+                serializer = serializers.ScheduleSerializer(
+                    user_schedules,
+                    many=True,
+                )
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except NotFound:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied:
+            return Response(status=status.HTTP_403_FORBIDDEN)
