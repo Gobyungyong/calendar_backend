@@ -154,13 +154,39 @@ class ScheduleDetails(APIView):
                     "개인의 일정을 삭제할 권한이 없습니다",
                 )
 
-    # def post(self, request, pk):
-    #     schedule = self.get_object(pk)
-    #     print("문자열:", schedule.user)
-    #     print("request", request.user)
-
-    #     print(schedule.team)
-
 
 class ScheduleSearch(APIView):
-    pass
+    def post(self, request):
+        keyword = request.data.get("search")
+
+        if keyword:
+            user = request.user
+
+            if user.team_set.all().exists():
+                teams = user.team_set.all()
+
+                user_schedules = Schedule.objects.filter(user=user).filter(
+                    title__icontains=keyword
+                )
+                team_schedules = Schedule.objects.filter(team__in=teams).filter(
+                    title__icontains=keyword
+                )
+
+                schedules = user_schedules.union(team_schedules)
+            else:
+                schedules = Schedule.objects.filter(user=user).filter(
+                    title__icontains=keyword
+                )
+
+            if schedules.exists():
+                serializer = serializers.ScheduleSerializer(
+                    schedules,
+                    many=True,
+                )
+
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response("검색결과가 없어!")
+
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
