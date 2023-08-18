@@ -72,23 +72,57 @@ class ScheduleDetails(APIView):
 
     def put(self, request, pk):
         schedule = self.get_object(pk)
+        print(schedule)
+        if schedule.team:
+            print("team schedule edited")
+            print(schedule.user)
+            print(request.user)
+            print(schedule.team.team_leader)
+            if (
+                schedule.user == request.user
+                or schedule.team.team_leader == request.user
+            ):
+                print(schedule.user == request.user)
+                print(schedule.team.team_leader == request.user)
+                serializer = serializers.ScheduleSerializer(
+                    schedule,
+                    data=request.data,
+                    partial=True,
+                )
+                if serializer.is_valid():
+                    updated_schedule = serializer.save()
+                    return Response(
+                        serializers.ScheduleSerializer(updated_schedule).data,
+                    )
+                return Response(
+                    "team_유효한 serializer",
+                )
+            else:
+                raise PermissionDenied(
+                    "팀의 일정을 수정할 권한이 없습니다",
+                )
 
-        if schedule.user == request.user or (
-            hasattr(schedule.team, "team_leader")
-            and schedule.team.team_leader == request.user,
-        ):
-            serializer = serializers.ScheduleSerializer(
-                schedule,
-                data=request.data,
-                partial=True,
-            )
-        if serializer.is_valid():
-            updated_schedule = serializer.save()
-            return Response(
-                serializers.ScheduleSerializer(updated_schedule).data,
-            )
         else:
-            return Response(serializer.errors)
+            print("user schedule edited")
+            if schedule.user == request.user:
+                serializer = serializers.ScheduleSerializer(
+                    schedule,
+                    data=request.data,
+                    partial=True,
+                )
+                if serializer.is_valid():
+                    updated_schedule = serializer.save()
+                    return Response(
+                        serializers.ScheduleSerializer(updated_schedule).data,
+                    )
+                return Response(
+                    "user_유효한 serializer",
+                )
+
+            else:
+                raise PermissionDenied(
+                    "개인의 일정을 수정할 권한이 없습니다",
+                )
 
     def delete(self, request, pk):
         schedule = self.get_object(pk)
@@ -100,15 +134,25 @@ class ScheduleDetails(APIView):
                 or schedule.team.team_leader == request.user
             ):
                 schedule.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    "팀 일정이 삭제되었습니다",
+                    status=status.HTTP_204_NO_CONTENT,
+                )
             else:
-                raise PermissionDenied
+                raise PermissionDenied(
+                    "팀의 일정을 삭제할 권한이 없습니다",
+                )
         else:
             if schedule.user == request.user:
                 schedule.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    "개인 일정이 삭제되었습니다",
+                    status=status.HTTP_204_NO_CONTENT,
+                )
             else:
-                raise PermissionDenied
+                raise PermissionDenied(
+                    "개인의 일정을 삭제할 권한이 없습니다",
+                )
 
     # def post(self, request, pk):
     #     schedule = self.get_object(pk)
