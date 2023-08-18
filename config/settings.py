@@ -151,3 +151,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 # 요청 헤더에 인증 정보를 포함
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_USE_SESSIONS = True
+CSRF_TRUSTED_ORIGINS = (
+    "https://port-0-calendar-backend-ac2nll4pdsc1.sel3.cloudtype.app",
+)
