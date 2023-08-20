@@ -8,7 +8,6 @@ from .models import Schedule
 from . import serializers
 
 
-# team에 속한 user의 team schedule과 개인 스케줄
 class Schedules(APIView):
     # authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -67,8 +66,19 @@ class ScheduleDetails(APIView):
 
     def get(self, request, pk):
         schedule = self.get_object(pk)
+        comments = Schedule.schedule.comments.all()
         serializer = serializers.ScheduleSerializer(schedule)
-        return Response(serializer.data)
+        comment_serializer = serializers.CommentSerializer(
+            comments,
+            many=True,
+        )
+
+        response_data = {
+            "schedule": serializer.data,
+            "comments": comment_serializer.data,
+        }
+
+        return Response(response_data)
 
     def put(self, request, pk):
         schedule = self.get_object(pk)
