@@ -6,6 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .models import Schedule
 from . import serializers
+from comments.serializers import ScheduleCommentSerializer
 
 
 class Schedules(APIView):
@@ -66,9 +67,9 @@ class ScheduleDetails(APIView):
 
     def get(self, request, pk):
         schedule = self.get_object(pk)
-        comments = Schedule.schedule.comments.all()
+        comments = schedule.comments.all()
         serializer = serializers.ScheduleSerializer(schedule)
-        comment_serializer = serializers.CommentSerializer(
+        comment_serializer = ScheduleCommentSerializer(
             comments,
             many=True,
         )
