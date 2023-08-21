@@ -47,6 +47,7 @@ CUSTOM_APPS = [
     "comments.apps.CommentsConfig",
     "corsheaders",
     "rest_framework",
+    "drf_yasg",
 ]
 SYSTEM_APPS = [
     "django.contrib.admin",

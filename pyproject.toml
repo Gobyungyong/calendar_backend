@@ -12,6 +12,8 @@ django = "^4.2.4"
 django-cors-headers = "^4.2.0"
 djangorestframework = "^3.14.0"
 django-environ = "^0.10.0"
+drf-yasg = "^1.21.7"
+drf-spectacular = "^0.26.4"
 
 
 [build-system]
