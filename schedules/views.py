@@ -113,6 +113,7 @@ class ScheduleDetails(APIView):
         serializer = serializers.ScheduleSerializer(schedule)
         comment_serializer = ScheduleCommentSerializer(
             comments,
+            context={"request": request},
             many=True,
         )
 
