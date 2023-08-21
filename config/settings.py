@@ -47,7 +47,7 @@ CUSTOM_APPS = [
     "comments.apps.CommentsConfig",
     "corsheaders",
     "rest_framework",
-    "drf_yasg",
+    "drf_spectacular",
 ]
 SYSTEM_APPS = [
     "django.contrib.admin",
@@ -57,6 +57,10 @@ SYSTEM_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
 
 INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS
 
@@ -152,3 +156,10 @@ CORS_ALLOWED_ORIGINS = [
 ]
 # 요청 헤더에 인증 정보를 포함
 CORS_ALLOW_CREDENTIALS = True
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "투고갓강",
+    "DESCRIPTION": "투고갓강 API 명세",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}

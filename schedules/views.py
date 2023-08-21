@@ -7,12 +7,24 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Schedule
 from . import serializers
 from comments.serializers import ScheduleCommentSerializer
+from drf_spectacular.utils import extend_schema, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 
 
 class Schedules(APIView):
     # authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["모든 일정 API"],
+        description="로그인 시 사용자의 개인 일정 및 팀의 스케줄 조회",
+        summary="전체 일정 조회",
+        responses={
+            200: serializers.ScheduleSerializer(many=True),  # HTTP 200 OK
+            404: "일정을 찾을 수 없음",  # HTTP 404 Not Found
+            403: "허가 거부됨",  # HTTP 403 Forbidden
+        },
+    )
     def get(self, request):
         try:
             user = request.user
@@ -40,6 +52,31 @@ class Schedules(APIView):
         except PermissionDenied:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
+    @extend_schema(
+        tags=["모든 일정 API"],
+        summary="일정 추가",
+        description="일정 추가",
+        responses={
+            201: serializers.ScheduleSerializer,  # HTTP 201 Created
+            400: OpenApiTypes.OBJECT,  # HTTP 400 Bad Request
+        },
+        examples=[
+            OpenApiExample(
+                response_only=True,
+                summary="성공적으로 추가된 일정",
+                name="calendar",
+                value={
+                    "title": "일정명",
+                    "description": "상세 내용",
+                    "state": "상태",
+                    "start_date": "시작 일시",
+                    "end_date": "종료 일시",
+                    "user": "사용자",
+                    "team": "팀",
+                },
+            ),
+        ],
+    )
     def post(self, request):
         serializer = serializers.ScheduleSerializer(data=request.data)
 
@@ -65,6 +102,11 @@ class ScheduleDetails(APIView):
         except Schedule.DoesNotExist:
             raise NotFound
 
+    @extend_schema(
+        tags=["일정 조회, 수정 및 삭제 API"],
+        summary="일정 및 연결된 댓글 조회",
+        description="일정 조회 및 일정에 연결된 댓글 조회",
+    )
     def get(self, request, pk):
         schedule = self.get_object(pk)
         comments = schedule.comments.all()
@@ -81,20 +123,18 @@ class ScheduleDetails(APIView):
 
         return Response(response_data)
 
+    @extend_schema(
+        tags=["일정 조회, 수정 및 삭제 API"],
+        summary="일정 수정",
+        description="일정 수정(조회 API 형식에 일부 수정 가능하게 만들어놨으니, 수정하고 싶은 데이터만 작성)",
+    )
     def put(self, request, pk):
         schedule = self.get_object(pk)
-        print(schedule)
         if schedule.team:
-            print("team schedule edited")
-            print(schedule.user)
-            print(request.user)
-            print(schedule.team.team_leader)
             if (
                 schedule.user == request.user
                 or schedule.team.team_leader == request.user
             ):
-                print(schedule.user == request.user)
-                print(schedule.team.team_leader == request.user)
                 serializer = serializers.ScheduleSerializer(
                     schedule,
                     data=request.data,
@@ -114,7 +154,6 @@ class ScheduleDetails(APIView):
                 )
 
         else:
-            print("user schedule edited")
             if schedule.user == request.user:
                 serializer = serializers.ScheduleSerializer(
                     schedule,
@@ -135,10 +174,13 @@ class ScheduleDetails(APIView):
                     "개인의 일정을 수정할 권한이 없습니다",
                 )
 
+    @extend_schema(
+        tags=["일정 조회, 수정 및 삭제 API"],
+        summary="일정 삭제",
+    )
     def delete(self, request, pk):
         schedule = self.get_object(pk)
 
-        print(schedule.team)
         if schedule.team:
             if (
                 schedule.user == request.user
@@ -167,6 +209,33 @@ class ScheduleDetails(APIView):
 
 
 class ScheduleSearch(APIView):
+    @extend_schema(
+        tags=["일정 검색 API"],
+        summary="일정 검색",
+        description="일정 검색 API",
+        responses={
+            200: serializers.ScheduleSerializer(many=True),
+            400: "검색어가 필요합니다.",  # HTTP 400 Bad Request
+            404: "검색 결과가 없습니다.",  # HTTP 404 Not Found
+        },
+        examples=[
+            OpenApiExample(
+                response_only=True,
+                summary="일정 검색",
+                name="calendar",
+                value={
+                    "search": " 검색어명",
+                    "title": "일정명",
+                    # "description": "상세 내용",
+                    # "state": "상태",
+                    # "start_date": "시작 일시",
+                    # "end_date": "종료 일시",
+                    "user": "사용자",
+                    "team": "팀",
+                },
+            ),
+        ],
+    )
     def post(self, request):
         keyword = request.data.get("search")
 
