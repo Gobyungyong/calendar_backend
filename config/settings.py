@@ -47,6 +47,7 @@ CUSTOM_APPS = [
     "comments.apps.CommentsConfig",
     "corsheaders",
     "rest_framework",
+    "drf_spectacular",
 ]
 SYSTEM_APPS = [
     "django.contrib.admin",
@@ -56,6 +57,10 @@ SYSTEM_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
 
 INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS
 
@@ -156,3 +161,9 @@ CSRF_USE_SESSIONS = True
 CSRF_TRUSTED_ORIGINS = (
     "https://port-0-calendar-backend-ac2nll4pdsc1.sel3.cloudtype.app",
 )
+SPECTACULAR_SETTINGS = {
+    "TITLE": "투고갓강",
+    "DESCRIPTION": "투고갓강 API 명세",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
