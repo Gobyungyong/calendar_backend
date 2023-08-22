@@ -10,7 +10,7 @@ from teams.models import Team
 
 
 class Nicknames(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_team(self, team_id):
         try:

@@ -13,7 +13,7 @@ from drf_spectacular.types import OpenApiTypes
 
 class Schedules(APIView):
     # authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["모든 일정 API"],
@@ -94,7 +94,7 @@ class Schedules(APIView):
 
 
 class ScheduleDetails(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         try:

@@ -10,7 +10,7 @@ from .models import Comment
 
 
 class NewComment(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = CommentSerializer(data=request.data)
@@ -30,7 +30,7 @@ class NewComment(APIView):
 
 
 class Comments(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         try:
