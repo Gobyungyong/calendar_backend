@@ -10,7 +10,7 @@ from .models import Team
 
 
 class NewTeam(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = TeamSerializer(data=request.data)
@@ -21,7 +21,7 @@ class NewTeam(APIView):
 
 
 class Teams(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_team(self, team_id):
         try:

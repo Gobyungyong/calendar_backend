@@ -58,7 +58,7 @@ class Login(APIView):
 
 
 class Logout(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         logout(request)
@@ -80,7 +80,7 @@ class CheckUsername(APIView):
 
 
 class UserInfo(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_object(self, username):
         try:
