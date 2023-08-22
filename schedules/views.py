@@ -42,12 +42,10 @@ class Schedules(APIView):
                     schedules,
                     many=True,
                 )
-                print("가나다라", schedule_serializer)
                 team_serializer = serializers.TeamSerializer(
                     teams,
                     many=True,
                 )
-                print("팀시리얼라이저", team_serializer)
 
                 response_data = {
                     "schedules": schedule_serializer.data,
@@ -93,7 +91,6 @@ class Schedules(APIView):
     )
     def post(self, request):
         team_id = request.data.get("team", None)
-        print(team_id)
 
         if team_id is not None:
             try:
