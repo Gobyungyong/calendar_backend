@@ -92,9 +92,18 @@ class Schedules(APIView):
         ],
     )
     def post(self, request):
-        team_id = request.data.get("team")
+        team_id = request.data.get("team", None)
+        print(team_id)
 
-        team = Team.objects.get(id=team_id)
+        if team_id is not None:
+            try:
+                team = Team.objects.get(id=team_id)
+            except Team.DoesNotExist:
+                return Response(
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            team = None
 
         serializer = serializers.ScheduleSerializer(
             data=request.data,

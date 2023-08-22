@@ -12,7 +12,7 @@ class ScheduleAdmin(admin.ModelAdmin):
         "start_date",
         "end_date",
         "state",
-        "repeat",
+        # "repeat",
         "user",
         "team",
     )
