@@ -5,7 +5,10 @@ from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .models import Schedule
+from teams.models import Team
 from . import serializers
+from .serializers import TeamSerializer
+
 from comments.serializers import ScheduleCommentSerializer
 from drf_spectacular.utils import extend_schema, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
@@ -34,11 +37,23 @@ class Schedules(APIView):
                 user_schedules = Schedule.objects.filter(user=user)
                 team_schedules = Schedule.objects.filter(team__in=teams)
                 schedules = user_schedules.union(team_schedules)
-                serializer = serializers.ScheduleSerializer(
+
+                schedule_serializer = serializers.ScheduleSerializer(
                     schedules,
                     many=True,
                 )
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                print("가나다라", schedule_serializer)
+                team_serializer = serializers.TeamSerializer(
+                    teams,
+                    many=True,
+                )
+                print("팀시리얼라이저", team_serializer)
+
+                response_data = {
+                    "schedules": schedule_serializer.data,
+                    "teams": team_serializer.data,
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
             else:
                 user_schedules = Schedule.objects.filter(user=user)
                 serializer = serializers.ScheduleSerializer(
@@ -71,19 +86,34 @@ class Schedules(APIView):
                     "state": "상태",
                     "start_date": "시작 일시",
                     "end_date": "종료 일시",
-                    "user": "사용자",
                     "team": "팀",
                 },
             ),
         ],
     )
     def post(self, request):
-        serializer = serializers.ScheduleSerializer(data=request.data)
+        team_id = request.data.get("team")
+
+        team = Team.objects.get(id=team_id)
+
+        serializer = serializers.ScheduleSerializer(
+            data=request.data,
+        )
 
         if serializer.is_valid():
-            schedule = serializer.save()
+            schedule = serializer.save(
+                user=request.user,
+                team=team,
+            )
+            team_data = TeamSerializer(team).data
+
+            response_data = {
+                "schedule": serializers.ScheduleSerializer(schedule).data,
+                "team": team_data,
+            }
+
             return Response(
-                serializers.ScheduleSerializer(schedule).data,
+                response_data,
                 status=status.HTTP_201_CREATED,
             )
         else:
