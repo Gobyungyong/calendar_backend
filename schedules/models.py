@@ -8,9 +8,9 @@ class Schedule(models.Model):
 
     # color = models.CharField(max_length=20, choices = ColorChoices.choices,)
     class StateChoices(models.TextChoices):
-        TODO = ("to_do", "To do")
-        DOING = ("doing", "Doing")
-        Done = ("done", "Done")
+        TODO = ("To do", "to_do")
+        DOING = ("Doing", "doing")
+        Done = ("Done", "done")
 
     state = models.CharField(
         max_length=20,
