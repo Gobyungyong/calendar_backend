@@ -28,13 +28,24 @@ class Nicknames(APIView):
         ).exists():
             raise ValidationError("중복된 닉네임입니다.")
 
+        # if serializer.is_valid():
+        #     serializer.save(
+        #         user=request.user,
+        #         team=team,
+        #     )
+        #     return Response(status=status.HTTP_200_OK)
+
+        # start for testing
+        from users.models import User
+
+        user = User.objects.get(id=1)
         if serializer.is_valid():
             serializer.save(
-                user=request.user,
+                user=user,
                 team=team,
             )
             return Response(status=status.HTTP_200_OK)
-
+        # end for testing
         raise ParseError("잘못된 요청입니다.")
 
     def put(self, request, team_id):
