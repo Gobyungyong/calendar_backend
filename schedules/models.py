@@ -17,16 +17,16 @@ class Schedule(models.Model):
         choices=StateChoices.choices,
     )
 
-    class RepeatChoices(models.TextChoices):
-        NONE = ("none", "반복 없음")
-        WEEKLY = ("weekly", "매주 반복")
-        MONTHLY = ("monthly", "매달 반복")
-        YEARLY = ("yearly", "매년 반복")
+    # class RepeatChoices(models.TextChoices):
+    #     NONE = ("none", "반복 없음")
+    #     WEEKLY = ("weekly", "매주 반복")
+    #     MONTHLY = ("monthly", "매달 반복")
+    #     YEARLY = ("yearly", "매년 반복")
 
-    repeat = models.CharField(
-        max_length=10,
-        choices=RepeatChoices.choices,
-    )
+    # repeat = models.CharField(
+    #     max_length=10,
+    #     choices=RepeatChoices.choices,
+    # )
 
     # class ColorChoices(models.Choices):
 
