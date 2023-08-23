@@ -101,9 +101,15 @@ class Schedules(APIView):
             else:  # 익명 사용자인 경우
                 user = User(username="AnonymousUser")
                 print(user)
-                user_schedules = Schedule.objects.filter(user=user)
+                # user_schedules = Schedule.objects.filter(user=user)
+                # serializer = serializers.ScheduleSerializer(
+                #     user_schedules,
+                #     many=True,
+                # )
+                schedules_all = Schedule.objects.all()
+                print("test: ", schedules_all)
                 serializer = serializers.ScheduleSerializer(
-                    user_schedules,
+                    schedules_all,
                     many=True,
                 )
                 return Response(serializer.data, status=status.HTTP_200_OK)
