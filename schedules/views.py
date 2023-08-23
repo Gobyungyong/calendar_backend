@@ -12,7 +12,8 @@ from comments.serializers import ScheduleCommentSerializer
 from drf_spectacular.utils import extend_schema, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from users.models import User
 
 
 class Schedules(APIView):
@@ -68,7 +69,7 @@ class Schedules(APIView):
     def get(self, request):
         try:
             user = request.user
-
+            print("1", user)
             if user.is_authenticated:  # 사용자가 로그인한 경우
                 if user.team_set.all().exists():
                     teams = user.team_set.all()
@@ -99,7 +100,7 @@ class Schedules(APIView):
                     return Response(serializer.data, status=status.HTTP_200_OK)
             else:  # 익명 사용자인 경우
                 user = User(username="anonymous")
-                user.save()
+                print(user)
                 user_schedules = Schedule.objects.filter(user=user)
                 serializer = serializers.ScheduleSerializer(
                     user_schedules,
