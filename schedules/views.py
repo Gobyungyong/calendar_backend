@@ -12,6 +12,8 @@ from comments.serializers import ScheduleCommentSerializer
 from drf_spectacular.utils import extend_schema, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 
+from django.contrib.auth.models import User
+
 
 class Schedules(APIView):
     # permission_classes = [IsAuthenticated]
@@ -96,9 +98,14 @@ class Schedules(APIView):
                     )
                     return Response(serializer.data, status=status.HTTP_200_OK)
             else:  # 익명 사용자인 경우
-                return Response(
-                    {"message": "로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED
+                user = User(username="anonymous")
+                user.save()
+                user_schedules = Schedule.objects.filter(user=user)
+                serializer = serializers.ScheduleSerializer(
+                    user_schedules,
+                    many=True,
                 )
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
         except NotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
